@@ -52,16 +52,16 @@ def browse():
         # Case-insensitive search for location
         query = query.filter(Job.location.ilike(f'%{location}%'))
 
-    # General search (searches title, company, description, skills)
+    # General search (searches title and skills only - optimized for performance)
     if search:
-        # Expand common tech abbreviations for better matching
+        # Expand common tech abbreviations for better matching (limit to 2 terms max)
         search_lower = search.lower()
 
-        # Map common abbreviations to full terms
+        # Map common abbreviations to full terms (reduced to avoid query timeout)
         expansions = {
-            'ai': ['artificial intelligence', 'ai/ml', 'ai engineer', 'ai scientist'],
-            'ml': ['machine learning', 'ml engineer', 'ml scientist'],
-            'nlp': ['natural language processing', 'nlp engineer'],
+            'ai': ['artificial intelligence', 'ai/ml'],
+            'ml': ['machine learning', 'ml engineer'],
+            'nlp': ['natural language processing'],
             'cv': ['computer vision'],
             'dl': ['deep learning'],
         }
@@ -72,14 +72,12 @@ def browse():
         else:
             search_terms = [search]
 
-        # Build OR conditions - prioritize title and skills matches
+        # Build OR conditions - only search title and tagsAndSkills (not jobDescription to avoid timeout)
         conditions = []
         for term in search_terms:
             conditions.extend([
                 Job.title.ilike(f'%{term}%'),
-                Job.companyName.ilike(f'%{term}%'),
                 Job.tagsAndSkills.ilike(f'%{term}%'),
-                Job.jobDescription.ilike(f'%{term}%'),
             ])
 
         search_filter = db.or_(*conditions)
