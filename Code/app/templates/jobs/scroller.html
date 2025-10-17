@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block title %}Job Scroller - Lakshya{% endblock %}
+
+{% block content %}
+<!-- Full-screen TikTok-style job scroller -->
+<div id="job-scroller" class="job-scroller fixed top-0 left-0 right-0 bottom-0 bg-black">
+    <!-- Jobs will be dynamically loaded here -->
+    <div class="spinner-container flex items-center justify-center h-screen">
+        <div class="spinner"></div>
+    </div>
+</div>
+
+<!-- Navigation overlay -->
+<div class="fixed top-4 left-4 z-50">
+    <a href="{{ url_for('jobs.browse') }}" class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white px-4 py-2 rounded-lg shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+        <i class="fas fa-arrow-left mr-2"></i>Back to Browse
+    </a>
+</div>
+
+<!-- Instructions overlay -->
+<div class="fixed bottom-4 left-0 right-0 z-50 flex justify-center">
+    <div class="bg-white dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-90 px-6 py-3 rounded-lg shadow-lg">
+        <p class="text-sm text-gray-700 dark:text-gray-300">
+            <i class="fas fa-swipe-up mr-2"></i>Scroll or swipe to view more jobs
+        </p>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const scroller = document.getElementById('job-scroller');
+    let currentPage = 1;
+    let isLoading = false;
+    let hasMore = true;
+
+    // Load initial jobs
+    loadJobs(currentPage);
+
+    // Infinite scroll
+    scroller.addEventListener('scroll', function() {
+        if (isLoading || !hasMore) return;
+
+        const scrollPosition = scroller.scrollTop + scroller.clientHeight;
+        const scrollHeight = scroller.scrollHeight;
+
+        if (scrollPosition >= scrollHeight - 200) {
+            currentPage++;
+            loadJobs(currentPage);
+        }
+    });
+
+    function loadJobs(page) {
+        isLoading = true;
+
+        fetch(`/jobs/feed?page=${page}`)
+            .then(response => response.json())
+            .then(data => {
+                const spinnerContainer = document.querySelector('.spinner-container');
+                if (spinnerContainer) {
+                    spinnerContainer.remove();
+                }
+
+                if (data.jobs && data.jobs.length > 0) {
+                    data.jobs.forEach(job => {
+                        const jobCard = createJobCard(job);
+                        scroller.appendChild(jobCard);
+                    });
+                } else {
+                    hasMore = false;
+                    const endMessage = document.createElement('div');
+                    endMessage.className = 'job-card-fullscreen flex items-center justify-center';
+                    endMessage.innerHTML = `
+                        <div class="text-center text-white">
+                            <i class="fas fa-check-circle text-6xl mb-4"></i>
+                            <h2 class="text-2xl font-bold mb-2">You've seen all available jobs!</h2>
+                            <a href="{{ url_for('jobs.browse') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg mt-4 inline-block hover:bg-blue-700 transition">
+                                Browse All Jobs
+                            </a>
+                        </div>
+                    `;
+                    scroller.appendChild(endMessage);
+                }
+
+                isLoading = false;
+            })
+            .catch(error => {
+                console.error('Error loading jobs:', error);
+                isLoading = false;
+            });
+    }
+
+    function createJobCard(job) {
+        const div = document.createElement('div');
+        div.className = 'job-card-fullscreen bg-gradient-to-br from-gray-900 to-gray-800 text-white';
+        div.innerHTML = `
+            <div class="max-w-2xl w-full mx-auto px-6">
+                <!-- Company Logo -->
+                ${job.company_logo ? `<img src="${job.company_logo}" alt="${job.company}" class="w-20 h-20 rounded-full mx-auto mb-4 border-4 border-white">` : ''}
+
+                <!-- Job Title -->
+                <h2 class="text-4xl font-bold mb-2 text-center">${escapeHtml(job.title)}</h2>
+
+                <!-- Company -->
+                <p class="text-2xl text-gray-300 mb-1 text-center">${escapeHtml(job.company)}</p>
+
+                <!-- Location & Type -->
+                <div class="flex justify-center gap-4 mb-6 text-sm text-gray-400">
+                    ${job.location ? `<span><i class="fas fa-map-marker-alt mr-1"></i>${escapeHtml(job.location)}</span>` : ''}
+                    ${job.type ? `<span><i class="fas fa-briefcase mr-1"></i>${escapeHtml(job.type)}</span>` : ''}
+                    ${job.salary ? `<span><i class="fas fa-dollar-sign mr-1"></i>${escapeHtml(job.salary)}</span>` : ''}
+                </div>
+
+                <!-- Description -->
+                <p class="text-lg text-gray-200 mb-6 text-center max-h-32 overflow-y-auto">${escapeHtml(job.description)}</p>
+
+                <!-- Match Score -->
+                ${job.match_score ? `
+                    <div class="mb-6">
+                        <div class="flex items-center justify-center mb-2">
+                            <span class="text-lg font-semibold">Match Score</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-4">
+                            <div class="bg-gradient-to-r from-blue-500 to-green-500 h-4 rounded-full transition-all duration-500" style="width: ${job.match_score}%"></div>
+                        </div>
+                        <p class="text-center mt-2 text-2xl font-bold">${job.match_score}%</p>
+                    </div>
+                ` : ''}
+
+                <!-- Skills -->
+                ${job.skills && job.skills.length > 0 ? `
+                    <div class="flex flex-wrap justify-center gap-2 mb-8">
+                        ${job.skills.map(skill => `
+                            <span class="bg-blue-600 bg-opacity-50 px-4 py-2 rounded-full text-sm font-semibold">
+                                ${escapeHtml(skill)}
+                            </span>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
+                <!-- Action Buttons -->
+                <div class="flex gap-4 mb-4">
+                    <button onclick="applyJob(${job.id})" class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-blue-800 transition transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-paper-plane mr-2"></i>Apply Now
+                    </button>
+                    <button onclick="saveJob(${job.id})" class="bg-gray-700 bg-opacity-50 text-white p-4 rounded-xl hover:bg-opacity-70 transition">
+                        <i class="fas fa-bookmark text-2xl"></i>
+                    </button>
+                </div>
+
+                <!-- View Details Link -->
+                <div class="text-center">
+                    <a href="/jobs/${job.id}" class="text-blue-400 hover:text-blue-300 underline">
+                        <i class="fas fa-info-circle mr-1"></i>View Full Details
+                    </a>
+                </div>
+            </div>
+        `;
+        return div;
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return String(text).replace(/[&<>"']/g, m => map[m]);
+    }
+});
+</script>
+{% endblock %}

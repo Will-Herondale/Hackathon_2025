@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+
+{% block title %}My Dream Collage - Lakshya{% endblock %}
+
+{% block content %}
+<div class="pt-16 bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Fun Header for Kids -->
+        <div class="mb-8 text-center">
+            <h1 class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 mb-3 animate-pulse">
+                My Dream College Collage
+            </h1>
+            <p class="text-xl text-gray-700 dark:text-gray-300">
+                Create your vision board of dream colleges!
+            </p>
+            <div class="text-6xl mt-4">
+                <span class="inline-block animate-bounce">&#127891;</span>
+                <span class="inline-block animate-bounce" style="animation-delay: 0.1s;">&#11088;</span>
+                <span class="inline-block animate-bounce" style="animation-delay: 0.2s;">&#127881;</span>
+                <span class="inline-block animate-bounce" style="animation-delay: 0.3s;">&#128640;</span>
+            </div>
+        </div>
+
+        <!-- Add New College Button -->
+        <div class="text-center mb-8">
+            <button onclick="showAddCollageModal()" class="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-8 py-4 rounded-full text-xl font-bold hover:from-pink-600 hover:to-purple-600 transition transform hover:scale-105 shadow-lg">
+                <i class="fas fa-plus-circle mr-2"></i>Add Dream College
+            </button>
+        </div>
+
+        {% if collages %}
+            <!-- Collage Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+                {% for collage in collages %}
+                    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-6 transform hover:scale-105 transition duration-300 border-4 {{ 'border-yellow-400' if collage.is_primary else 'border-purple-300' }}">
+                        {% if collage.is_primary %}
+                            <div class="text-center mb-4">
+                                <span class="bg-yellow-400 text-yellow-900 px-4 py-2 rounded-full text-sm font-bold inline-block">
+                                    &#11088; MY TOP CHOICE &#11088;
+                                </span>
+                            </div>
+                        {% endif %}
+
+                        <!-- College Logo -->
+                        {% if collage.college_logo_url %}
+                            <div class="text-center mb-4">
+                                <img src="{{ collage.college_logo_url }}" alt="{{ collage.college_name }}" class="h-24 w-24 object-contain mx-auto rounded-full border-4 border-purple-300 shadow-lg">
+                            </div>
+                        {% else %}
+                            <div class="text-center mb-4">
+                                <div class="h-24 w-24 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full mx-auto flex items-center justify-center text-4xl text-white font-bold shadow-lg">
+                                    {{ collage.college_name[0] }}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- College Name -->
+                        <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-4">
+                            {{ collage.college_name }}
+                        </h2>
+
+                        <!-- Target Year -->
+                        {% if collage.target_year %}
+                            <div class="text-center mb-4">
+                                <span class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-4 py-2 rounded-full text-sm font-semibold">
+                                    <i class="fas fa-calendar-alt mr-1"></i>Target: {{ collage.target_year }}
+                                </span>
+                            </div>
+                        {% endif %}
+
+                        <!-- Motivation Text -->
+                        {% if collage.motivation_text %}
+                            <div class="bg-gradient-to-r from-yellow-100 to-pink-100 dark:from-yellow-900 dark:to-pink-900 rounded-xl p-4 mb-4">
+                                <p class="text-center text-gray-800 dark:text-white font-semibold italic">
+                                    "{{ collage.motivation_text }}"
+                                </p>
+                            </div>
+                        {% endif %}
+
+                        <!-- Why This College -->
+                        {% if collage.why_this_college %}
+                            <div class="mb-4">
+                                <h3 class="text-lg font-bold text-purple-600 dark:text-purple-400 mb-2 flex items-center">
+                                    <i class="fas fa-heart mr-2"></i>Why I Love This College:
+                                </h3>
+                                <p class="text-gray-700 dark:text-gray-300">
+                                    {{ collage.why_this_college }}
+                                </p>
+                            </div>
+                        {% endif %}
+
+                        <!-- College Images Collage -->
+                        {% if collage.images_list %}
+                            <div class="mb-4">
+                                <h3 class="text-lg font-bold text-purple-600 dark:text-purple-400 mb-2 flex items-center">
+                                    <i class="fas fa-images mr-2"></i>My Inspiration Board:
+                                </h3>
+                                <div class="grid grid-cols-2 gap-2">
+                                    {% for image_url in collage.images_list[:4] %}
+                                        <img src="{{ image_url }}" alt="College inspiration" class="w-full h-32 object-cover rounded-lg shadow-md border-2 border-purple-200">
+                                    {% endfor %}
+                                </div>
+                                {% if collage.images_list|length > 4 %}
+                                    <p class="text-center text-sm text-gray-600 dark:text-gray-400 mt-2">
+                                        +{{ collage.images_list|length - 4 }} more images
+                                    </p>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Action Buttons -->
+                        <div class="flex gap-2 mt-4">
+                            {% if not collage.is_primary %}
+                                <button onclick="setPrimary({{ collage.id }})" class="flex-1 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 px-4 py-2 rounded-lg font-semibold transition">
+                                    <i class="fas fa-star mr-1"></i>Make Top Choice
+                                </button>
+                            {% endif %}
+                            <button onclick="editCollage({{ collage.id }})" class="flex-1 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold transition">
+                                <i class="fas fa-edit mr-1"></i>Edit
+                            </button>
+                            <button onclick="deleteCollage({{ collage.id }})" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-16">
+                <div class="text-9xl mb-6 animate-bounce">
+                    &#127891;
+                </div>
+                <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-4">
+                    Start Your Dream Journey!
+                </h2>
+                <p class="text-xl text-gray-600 dark:text-gray-400 mb-8">
+                    Add your first dream college and create an inspiring vision board
+                </p>
+                <button onclick="showAddCollageModal()" class="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-8 py-4 rounded-full text-xl font-bold hover:from-pink-600 hover:to-purple-600 transition transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-plus-circle mr-2"></i>Add My First Dream College
+                </button>
+            </div>
+        {% endif %}
+
+        <!-- Fun Motivational Section -->
+        <div class="mt-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl shadow-2xl p-8 text-white text-center">
+            <h2 class="text-3xl font-bold mb-4">Keep Dreaming Big!</h2>
+            <p class="text-xl mb-4">
+                Every great achievement starts with a dream. Your college journey begins here!
+            </p>
+            <div class="flex justify-center gap-4 text-5xl">
+                <span class="animate-bounce">&#11088;</span>
+                <span class="animate-bounce" style="animation-delay: 0.1s;">&#128170;</span>
+                <span class="animate-bounce" style="animation-delay: 0.2s;">&#128293;</span>
+                <span class="animate-bounce" style="animation-delay: 0.3s;">&#127881;</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Collage Modal -->
+<div id="addCollageModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl max-w-2xl w-full p-8 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500">
+                Add Dream College
+            </h3>
+            <button onclick="closeAddCollageModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <i class="fas fa-times text-3xl"></i>
+            </button>
+        </div>
+
+        <form id="addCollageForm" class="space-y-6">
+            <div>
+                <label class="block text-lg font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    <i class="fas fa-university mr-2 text-purple-500"></i>College Name
+                </label>
+                <input type="text" name="college_name" required placeholder="e.g., MIT, Stanford, Harvard" class="w-full px-4 py-3 rounded-xl border-2 border-purple-300 dark:border-purple-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-purple-500 transition text-lg">
+            </div>
+
+            <div>
+                <label class="block text-lg font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    <i class="fas fa-image mr-2 text-pink-500"></i>College Logo URL
+                </label>
+                <input type="url" name="college_logo_url" placeholder="https://example.com/logo.png" class="w-full px-4 py-3 rounded-xl border-2 border-pink-300 dark:border-pink-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-pink-500 transition">
+            </div>
+
+            <div>
+                <label class="block text-lg font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    <i class="fas fa-calendar-alt mr-2 text-blue-500"></i>Target Year
+                </label>
+                <input type="number" name="target_year" placeholder="2028" min="2024" max="2040" class="w-full px-4 py-3 rounded-xl border-2 border-blue-300 dark:border-blue-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 transition text-lg">
+            </div>
+
+            <div>
+                <label class="block text-lg font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    <i class="fas fa-quote-left mr-2 text-yellow-500"></i>My Motivation
+                </label>
+                <textarea name="motivation_text" rows="3" placeholder="What drives you to achieve this dream?" class="w-full px-4 py-3 rounded-xl border-2 border-yellow-300 dark:border-yellow-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-yellow-500 transition"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-lg font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    <i class="fas fa-heart mr-2 text-red-500"></i>Why This College?
+                </label>
+                <textarea name="why_this_college" rows="4" placeholder="What makes this college special to you?" class="w-full px-4 py-3 rounded-xl border-2 border-red-300 dark:border-red-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-red-500 transition"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-lg font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    <i class="fas fa-images mr-2 text-green-500"></i>Inspiration Images (URLs)
+                </label>
+                <div id="imageUrlsContainer">
+                    <input type="url" name="college_images[]" placeholder="https://example.com/image1.png" class="w-full px-4 py-3 rounded-xl border-2 border-green-300 dark:border-green-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-green-500 transition mb-2">
+                </div>
+                <button type="button" onclick="addImageUrlField()" class="text-green-600 dark:text-green-400 hover:underline font-semibold">
+                    <i class="fas fa-plus-circle mr-1"></i>Add Another Image
+                </button>
+            </div>
+
+            <div class="flex gap-3 mt-8">
+                <button type="submit" class="flex-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-3 rounded-xl text-lg font-bold hover:from-pink-600 hover:to-purple-600 transition transform hover:scale-105">
+                    <i class="fas fa-plus-circle mr-2"></i>Add to My Collage
+                </button>
+                <button type="button" onclick="closeAddCollageModal()" class="px-8 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white py-3 rounded-xl font-bold hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function showAddCollageModal() {
+    document.getElementById('addCollageModal').classList.remove('hidden');
+}
+
+function closeAddCollageModal() {
+    document.getElementById('addCollageModal').classList.add('hidden');
+    document.getElementById('addCollageForm').reset();
+}
+
+function addImageUrlField() {
+    const container = document.getElementById('imageUrlsContainer');
+    const input = document.createElement('input');
+    input.type = 'url';
+    input.name = 'college_images[]';
+    input.placeholder = 'https://example.com/image.png';
+    input.className = 'w-full px-4 py-3 rounded-xl border-2 border-green-300 dark:border-green-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-green-500 transition mb-2';
+    container.appendChild(input);
+}
+
+document.getElementById('addCollageForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+
+    fetch('{{ url_for("dashboard.add_collage") }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Dream college added to your collage!', 'success');
+            closeAddCollageModal();
+            location.reload();
+        } else {
+            showNotification(data.message || 'Failed to add college', 'error');
+        }
+    })
+    .catch(error => {
+        showNotification('An error occurred', 'error');
+    });
+});
+
+function setPrimary(collageId) {
+    const formData = new FormData();
+    formData.append('is_primary', 'true');
+
+    fetch(`/dashboard/collage/${collageId}/update`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Set as your top choice!', 'success');
+            location.reload();
+        } else {
+            showNotification(data.message || 'Failed to update', 'error');
+        }
+    })
+    .catch(error => {
+        showNotification('An error occurred', 'error');
+    });
+}
+
+function editCollage(collageId) {
+    // TODO: Implement edit modal
+    console.log('Edit collage:', collageId);
+    showNotification('Edit feature coming soon!', 'info');
+}
+
+function deleteCollage(collageId) {
+    if (!confirm('Are you sure you want to remove this college from your collage?')) {
+        return;
+    }
+
+    fetch(`/dashboard/collage/${collageId}/delete`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('College removed from your collage', 'success');
+            location.reload();
+        } else {
+            showNotification(data.message || 'Failed to delete', 'error');
+        }
+    })
+    .catch(error => {
+        showNotification('An error occurred', 'error');
+    });
+}
+
+function showNotification(message, type) {
+    // Simple notification - you can enhance this
+    alert(message);
+}
+</script>
+
+<style>
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.animate-bounce {
+    animation: bounce 1s ease-in-out infinite;
+}
+</style>
+{% endblock %}

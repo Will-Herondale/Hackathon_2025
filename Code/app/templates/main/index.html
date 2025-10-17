@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Lakshya - Build Your Future{% endblock %}
+
+{% block content %}
+<div class="pt-16">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-blue-600 to-purple-600 text-white py-20">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">
+                Build Your Portfolio, Find Your Dream Job
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
+                Connect with opportunities, learn new skills, and showcase your talents with AI-powered matching
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('profile.view', user_id=current_user.id) }}" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition transform hover:scale-105">
+                        <i class="fas fa-user mr-2"></i>
+                        View My Portfolio
+                    </a>
+                    <a href="{{ url_for('jobs.browse') }}" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white hover:text-blue-600 transition transform hover:scale-105">
+                        <i class="fas fa-briefcase mr-2"></i>
+                        Find Jobs
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('auth.register') }}" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition transform hover:scale-105">
+                        <i class="fas fa-rocket mr-2"></i>
+                        Get Started Free
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white hover:text-blue-600 transition transform hover:scale-105">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Log In
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- AI Career Advisor CTA -->
+            <div class="mt-8">
+                <a href="{{ url_for('main.career_advisor') }}" class="inline-flex items-center gap-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-8 py-4 rounded-full font-bold text-lg hover:from-yellow-500 hover:to-orange-600 transition transform hover:scale-105 shadow-2xl">
+                    <div class="bg-white rounded-full p-2">
+                        <i class="fas fa-robot text-2xl text-orange-500"></i>
+                    </div>
+                    <span>Talk to AI Career Advisor</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-gray-50 dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">
+                Everything You Need to Succeed
+            </h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Portfolio Feature -->
+                <div class="card bg-white dark:bg-gray-800 p-8 rounded-2xl text-center">
+                    <div class="bg-blue-100 dark:bg-blue-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-folder-open text-3xl text-blue-600 dark:text-blue-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Build Your Portfolio</h3>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        Showcase your projects, skills, and achievements with beautiful, customizable portfolio pages
+                    </p>
+                </div>
+
+                <!-- Events Feature -->
+                <div class="card bg-white dark:bg-gray-800 p-8 rounded-2xl text-center">
+                    <div class="bg-purple-100 dark:bg-purple-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-calendar-alt text-3xl text-purple-600 dark:text-purple-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Learn & Grow</h3>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        Discover workshops, courses, and events tailored to your interests and skill level
+                    </p>
+                </div>
+
+                <!-- AI Jobs Feature -->
+                <div class="card bg-white dark:bg-gray-800 p-8 rounded-2xl text-center">
+                    <div class="bg-green-100 dark:bg-green-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-robot text-3xl text-green-600 dark:text-green-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">AI Job Matching</h3>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        Get personalized job recommendations based on your skills, interests, and career goals
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-800 dark:text-white">
+                How It Works
+            </h2>
+            <div class="max-w-4xl mx-auto">
+                <div class="space-y-8">
+                    <div class="flex items-start gap-4">
+                        <div class="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xl">
+                            1
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2 text-gray-800 dark:text-white">Create Your Profile</h3>
+                            <p class="text-gray-600 dark:text-gray-400">Sign up and build your portfolio with projects, skills, and achievements</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="bg-purple-600 text-white w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xl">
+                            2
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2 text-gray-800 dark:text-white">Learn New Skills</h3>
+                            <p class="text-gray-600 dark:text-gray-400">Browse and enroll in courses, workshops, and events to expand your knowledge</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="bg-green-600 text-white w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xl">
+                            3
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2 text-gray-800 dark:text-white">Find Your Dream Job</h3>
+                            <p class="text-gray-600 dark:text-gray-400">Let AI match you with opportunities that fit your skills and career aspirations</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    {% if not current_user.is_authenticated %}
+    <section class="bg-gradient-to-r from-blue-600 to-purple-600 py-16">
+        <div class="container mx-auto px-4 text-center text-white">
+            <h2 class="text-4xl font-bold mb-4">Ready to Start Your Journey?</h2>
+            <p class="text-xl mb-8 text-blue-100">Join thousands of learners and job seekers building their future</p>
+            <a href="{{ url_for('auth.register') }}" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition inline-block transform hover:scale-105">
+                Sign Up Now - It's Free!
+            </a>
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

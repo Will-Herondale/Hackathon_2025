@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Colleges - Lakshya{% endblock %}
+
+{% block content %}
+<div class="pt-16 bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-green-600 to-blue-600 text-white py-12">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl font-bold mb-4">Browse Colleges</h1>
+            <p class="text-xl text-green-100">Find your dream college</p>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Stats -->
+        <div class="flex justify-between items-center mb-8">
+            <div class="text-gray-700 dark:text-gray-300">
+                <i class="fas fa-university mr-2"></i>
+                Showing {{ colleges|length }} colleges
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+            <form method="GET" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                        <input type="text" name="search" value="{{ search }}" placeholder="Search colleges..." class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    </div>
+                    <div>
+                        <input type="text" name="stream" value="{{ stream }}" placeholder="Stream (e.g., Engineering)" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    </div>
+                    <div>
+                        <input type="text" name="state" value="{{ state }}" placeholder="State" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    </div>
+                    <div>
+                        <input type="text" name="city" value="{{ city }}" placeholder="City" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    </div>
+                    <div>
+                        <input type="text" name="college_type" value="{{ college_type }}" placeholder="Type (Government/Private)" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="submit" class="flex-1 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                            <i class="fas fa-search mr-2"></i>Search
+                        </button>
+                        {% if search or stream or state or city or college_type %}
+                            <a href="{{ url_for('colleges.browse') }}" class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-6 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Colleges List -->
+        {% if colleges %}
+            <div class="space-y-6 mb-8">
+                {% for college in colleges %}
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition">
+                        <div class="p-6">
+                            <div class="flex items-start gap-4">
+                                <!-- College Icon -->
+                                <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center text-white text-2xl font-bold">
+                                    {{ college.college_name[0] if college.college_name else 'C' }}
+                                </div>
+
+                                <!-- College Info -->
+                                <div class="flex-1">
+                                    <div class="flex items-start justify-between mb-2">
+                                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white">
+                                            {{ college.college_name }}
+                                        </h3>
+                                        {% if college.tier_rank %}
+                                            <span class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm font-semibold">
+                                                {{ college.tier_rank }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Location & Type -->
+                                    <div class="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
+                                        {% if college.city and college.state %}
+                                            <span><i class="fas fa-map-marker-alt mr-1"></i>{{ college.city }}, {{ college.state }}</span>
+                                        {% endif %}
+                                        {% if college.college_type %}
+                                            <span><i class="fas fa-building mr-1"></i>{{ college.college_type }}</span>
+                                        {% endif %}
+                                        {% if college.stream %}
+                                            <span><i class="fas fa-graduation-cap mr-1"></i>{{ college.stream }}</span>
+                                        {% endif %}
+                                        {% if college.year_established %}
+                                            <span><i class="fas fa-calendar mr-1"></i>Est. {{ college.year_established }}</span>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Key Stats -->
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                        {% if college.seat_intake %}
+                                            <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                                                <div class="text-xs text-gray-600 dark:text-gray-400">Seat Intake</div>
+                                                <div class="text-lg font-bold text-gray-800 dark:text-white">{{ college.seat_intake }}</div>
+                                            </div>
+                                        {% endif %}
+                                        {% if college.placement_average_salary %}
+                                            <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                                                <div class="text-xs text-gray-600 dark:text-gray-400">Avg. Salary</div>
+                                                <div class="text-lg font-bold text-gray-800 dark:text-white">₹{{ college.placement_average_salary }}L</div>
+                                            </div>
+                                        {% endif %}
+                                        {% if college.accreditation %}
+                                            <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                                                <div class="text-xs text-gray-600 dark:text-gray-400">Accreditation</div>
+                                                <div class="text-lg font-bold text-gray-800 dark:text-white">{{ college.accreditation }}</div>
+                                            </div>
+                                        {% endif %}
+                                        {% if college.gender_ratio %}
+                                            <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                                                <div class="text-xs text-gray-600 dark:text-gray-400">Gender Ratio</div>
+                                                <div class="text-sm font-bold text-gray-800 dark:text-white">{{ college.gender_ratio }}</div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="flex gap-3">
+                                        <a href="{{ url_for('colleges.detail', college_id=college.id) }}" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                                            <i class="fas fa-info-circle mr-2"></i>View Details
+                                        </a>
+                                        {% if college.website_url %}
+                                            <a href="{{ college.website_url }}" target="_blank" class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-6 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                                                <i class="fas fa-external-link-alt mr-2"></i>Website
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if total_pages > 1 %}
+                <div class="flex justify-center gap-2">
+                    {% if page > 1 %}
+                        <a href="?page={{ page - 1 }}&stream={{ stream }}&state={{ state }}&city={{ city }}&college_type={{ college_type }}&search={{ search }}"
+                           class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                            <i class="fas fa-chevron-left mr-2"></i>Previous
+                        </a>
+                    {% endif %}
+
+                    <span class="bg-green-600 text-white px-4 py-2 rounded-lg">
+                        Page {{ page }} of {{ total_pages }}
+                    </span>
+
+                    {% if page < total_pages %}
+                        <a href="?page={{ page + 1 }}&stream={{ stream }}&state={{ state }}&city={{ city }}&college_type={{ college_type }}&search={{ search }}"
+                           class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                            Next<i class="fas fa-chevron-right ml-2"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-20 text-gray-500 dark:text-gray-400">
+                <i class="fas fa-university text-6xl mb-4"></i>
+                <p class="text-xl">No colleges found</p>
+                <p class="text-sm mt-2">Try adjusting your search filters</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

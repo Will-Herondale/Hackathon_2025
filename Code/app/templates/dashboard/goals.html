@@ -1,0 +1,323 @@
+{% extends 'base.html' %}
+
+{% block title %}Goals - Lakshya{% endblock %}
+
+{% block content %}
+<div class="pt-16 bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-4xl font-bold text-gray-800 dark:text-white mb-2 flex items-center">
+                    <i class="fas fa-bullseye text-blue-600 mr-3"></i>
+                    Your Goals
+                </h1>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Set and track your dream colleges, companies, and personal goals
+                </p>
+            </div>
+            <button onclick="showAddGoalModal()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                <i class="fas fa-plus mr-2"></i>Add New Goal
+            </button>
+        </div>
+
+        <!-- Goals Categories Tabs -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-2 mb-8 flex gap-2 overflow-x-auto">
+            <button onclick="filterGoals('all')" class="goal-filter-btn active px-6 py-3 rounded-lg font-semibold transition">
+                All Goals
+            </button>
+            <button onclick="filterGoals('education')" class="goal-filter-btn px-6 py-3 rounded-lg font-semibold transition">
+                🎓 Education
+            </button>
+            <button onclick="filterGoals('career')" class="goal-filter-btn px-6 py-3 rounded-lg font-semibold transition">
+                💼 Career
+            </button>
+            <button onclick="filterGoals('skill')" class="goal-filter-btn px-6 py-3 rounded-lg font-semibold transition">
+                📚 Skills
+            </button>
+            <button onclick="filterGoals('personal')" class="goal-filter-btn px-6 py-3 rounded-lg font-semibold transition">
+                ⭐ Personal
+            </button>
+        </div>
+
+        <!-- Goals Grid -->
+        {% if goals %}
+            <div class="grid md:grid-cols-2 gap-6" id="goalsContainer">
+                {% for goal in goals %}
+                    <div class="goal-card bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6" data-category="{{ goal.category }}">
+                        <!-- Goal Header -->
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="bg-{{ 'blue' if goal.category == 'education' else 'green' if goal.category == 'career' else 'purple' if goal.category == 'skill' else 'orange' }}-100 dark:bg-{{ 'blue' if goal.category == 'education' else 'green' if goal.category == 'career' else 'purple' if goal.category == 'skill' else 'orange' }}-900 text-{{ 'blue' if goal.category == 'education' else 'green' if goal.category == 'career' else 'purple' if goal.category == 'skill' else 'orange' }}-800 dark:text-{{ 'blue' if goal.category == 'education' else 'green' if goal.category == 'career' else 'purple' if goal.category == 'skill' else 'orange' }}-200 px-3 py-1 rounded-full text-xs font-semibold uppercase">
+                                        {{ goal.category }}
+                                    </span>
+                                    {% if goal.status == 'completed' %}
+                                        <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-xs font-semibold">
+                                            <i class="fas fa-check mr-1"></i>Completed
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">{{ goal.title }}</h3>
+                                <p class="text-gray-600 dark:text-gray-400">{{ goal.description }}</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="editGoal({{ goal.id }})" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="deleteGoal({{ goal.id }})" class="text-gray-400 hover:text-red-600 dark:hover:text-red-400">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Progress Section -->
+                        <div class="mb-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Progress</span>
+                                <span class="text-lg font-bold text-gray-800 dark:text-white">{{ goal.progress }}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-2">
+                                <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500" style="width: {{ goal.progress }}%"></div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="updateProgress({{ goal.id }}, -10)" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                                    <i class="fas fa-minus-circle"></i>
+                                </button>
+                                <input type="range" min="0" max="100" value="{{ goal.progress }}" onchange="updateProgress({{ goal.id }}, this.value)" class="flex-1">
+                                <button onclick="updateProgress({{ goal.id }}, +10)" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                                    <i class="fas fa-plus-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Goal Details -->
+                        <div class="space-y-2 text-sm">
+                            {% if goal.target_date %}
+                                <div class="flex items-center text-gray-600 dark:text-gray-400">
+                                    <i class="fas fa-calendar-alt mr-2 text-blue-600"></i>
+                                    Target: {{ goal.target_date.strftime('%B %d, %Y') if goal.target_date else 'No deadline' }}
+                                </div>
+                            {% endif %}
+
+                            {% if goal.created_at %}
+                                <div class="flex items-center text-gray-600 dark:text-gray-400">
+                                    <i class="fas fa-clock mr-2 text-gray-500"></i>
+                                    Started: {{ goal.created_at.strftime('%B %d, %Y') if goal.created_at else 'Recently' }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex gap-2 mt-4">
+                            {% if goal.status != 'completed' %}
+                                <button onclick="markComplete({{ goal.id }})" class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">
+                                    <i class="fas fa-check mr-2"></i>Mark Complete
+                                </button>
+                            {% endif %}
+                            <button onclick="shareGoal({{ goal.id }})" class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-12 text-center">
+                <div class="text-6xl mb-4">🎯</div>
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">No Goals Yet</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-6">
+                    Start by adding your dream college, company, or personal goal!
+                </p>
+                <button onclick="showAddGoalModal()" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition">
+                    <i class="fas fa-plus mr-2"></i>Add Your First Goal
+                </button>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add/Edit Goal Modal (reuse from dashboard) -->
+<div id="addGoalModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-gray-800 dark:text-white">Add New Goal</h3>
+            <button onclick="closeAddGoalModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+        </div>
+
+        <form id="addGoalForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Goal Type</label>
+                <select name="category" required class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    <option value="education">🎓 Education (Dream College)</option>
+                    <option value="career">💼 Career (Dream Company)</option>
+                    <option value="skill">📚 Skill Development</option>
+                    <option value="personal">⭐ Personal Goal</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Goal Title</label>
+                <input type="text" name="title" required placeholder="e.g., Get into MIT, Work at Google" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
+                <textarea name="description" rows="3" placeholder="Describe your goal and why it matters to you..." class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Target Date</label>
+                <input type="date" name="target_date" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+
+            <div class="flex gap-3 mt-6">
+                <button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
+                    <i class="fas fa-plus mr-2"></i>Add Goal
+                </button>
+                <button type="button" onclick="closeAddGoalModal()" class="px-6 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Modal Functions
+function showAddGoalModal() {
+    document.getElementById('addGoalModal').classList.remove('hidden');
+}
+
+function closeAddGoalModal() {
+    document.getElementById('addGoalModal').classList.add('hidden');
+}
+
+// Filter Goals
+function filterGoals(category) {
+    const cards = document.querySelectorAll('.goal-card');
+    const buttons = document.querySelectorAll('.goal-filter-btn');
+
+    buttons.forEach(btn => {
+        btn.classList.remove('active', 'bg-blue-600', 'text-white');
+        btn.classList.add('text-gray-700', 'dark:text-gray-300');
+    });
+
+    event.target.classList.add('active', 'bg-blue-600', 'text-white');
+    event.target.classList.remove('text-gray-700', 'dark:text-gray-300');
+
+    cards.forEach(card => {
+        if (category === 'all' || card.dataset.category === category) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// Update Progress
+function updateProgress(goalId, value) {
+    const currentProgress = parseInt(event.target.value || 0);
+    const newProgress = typeof value === 'string' ? parseInt(value) : currentProgress + value;
+    const clampedProgress = Math.max(0, Math.min(100, newProgress));
+
+    const formData = new FormData();
+    formData.append('progress', clampedProgress);
+
+    fetch(`/dashboard/goals/${goalId}/update`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+// Mark Complete
+function markComplete(goalId) {
+    if (confirm('Mark this goal as complete?')) {
+        const formData = new FormData();
+        formData.append('status', 'completed');
+        formData.append('progress', 100);
+
+        fetch(`/dashboard/goals/${goalId}/update`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Goal completed! 🎉', 'success');
+                location.reload();
+            }
+        });
+    }
+}
+
+// Delete Goal
+function deleteGoal(goalId) {
+    if (confirm('Are you sure you want to delete this goal?')) {
+        fetch(`/dashboard/goals/${goalId}/delete`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Goal deleted', 'info');
+                location.reload();
+            }
+        });
+    }
+}
+
+// Share Goal
+function shareGoal(goalId) {
+    showNotification('Share feature coming soon!', 'info');
+}
+
+// Edit Goal
+function editGoal(goalId) {
+    // TODO: Implement edit functionality
+    showNotification('Edit feature coming soon!', 'info');
+}
+
+// Form Submission
+document.getElementById('addGoalForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+
+    fetch('{{ url_for("dashboard.add_goal") }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Goal added successfully!', 'success');
+            closeAddGoalModal();
+            location.reload();
+        } else {
+            showNotification(data.message || 'Failed to add goal', 'error');
+        }
+    })
+    .catch(error => {
+        showNotification('An error occurred', 'error');
+    });
+});
+
+// Initialize active filter button
+document.querySelector('.goal-filter-btn').classList.add('bg-blue-600', 'text-white');
+</script>
+
+<style>
+.goal-filter-btn.active {
+    @apply bg-blue-600 text-white;
+}
+</style>
+{% endblock %}
