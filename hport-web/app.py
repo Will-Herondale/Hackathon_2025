@@ -1,22 +1,6 @@
-from flask import Flask, render_template, jsonify
-import os
+from app import create_app, socketio
 
-app = Flask(__name__)
-
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-@app.route('/api/health')
-def health():
-    return jsonify({'status': 'healthy', 'service': 'hport-web'})
-
-@app.route('/api/data')
-def get_data():
-    return jsonify({
-        'message': 'Hello from hport web app!',
-        'data': []
-    })
+app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=8000)
+    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
