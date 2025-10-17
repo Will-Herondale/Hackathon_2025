@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up - Lakshya{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full">
+        <!-- Logo and Title -->
+        <div class="text-center mb-8">
+            <i class="fas fa-rocket text-6xl text-blue-600 mb-4"></i>
+            <h2 class="text-4xl font-bold text-gray-900 dark:text-white">
+                Join Lakshya
+            </h2>
+            <p class="mt-2 text-gray-600 dark:text-gray-400">
+                Start building your future today
+            </p>
+        </div>
+
+        <!-- Registration Form -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+            <form method="POST" action="{{ url_for('auth.register') }}" class="space-y-6">
+                {{ form.hidden_tag() }}
+
+                <!-- Name Field -->
+                <div>
+                    {{ form.name.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2") }}
+                    {{ form.name(class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition", placeholder="John Doe") }}
+                    {% if form.name.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.name.errors[0] }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Email Field -->
+                <div>
+                    {{ form.email.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2") }}
+                    {{ form.email(class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition", placeholder="you@example.com") }}
+                    {% if form.email.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.email.errors[0] }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Password Field -->
+                <div>
+                    {{ form.password.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2") }}
+                    {{ form.password(class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition", placeholder="Minimum 8 characters") }}
+                    {% if form.password.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.password.errors[0] }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Confirm Password Field -->
+                <div>
+                    {{ form.confirm_password.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2") }}
+                    {{ form.confirm_password(class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition", placeholder="Re-enter password") }}
+                    {% if form.confirm_password.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.confirm_password.errors[0] }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- User Type Field -->
+                <div>
+                    {{ form.user_type.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2") }}
+                    {{ form.user_type(class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition") }}
+                    {% if form.user_type.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.user_type.errors[0] }}
+                        </div>
+                    {% endif %}
+                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Student mode provides a simplified, learning-focused experience
+                    </p>
+                </div>
+
+                <!-- Terms Checkbox -->
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        {{ form.terms(class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded") }}
+                    </div>
+                    <div class="ml-3 text-sm">
+                        {{ form.terms.label(class="text-gray-700 dark:text-gray-300") }}
+                        {% if form.terms.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {{ form.terms.errors[0] }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition transform hover:scale-105">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Create Account
+                </button>
+
+                <!-- Divider -->
+                <div class="relative my-6">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white dark:bg-gray-800 text-gray-500">Or sign up with</span>
+                    </div>
+                </div>
+
+                <!-- Social Sign Up Buttons (Optional) -->
+                <div class="grid grid-cols-2 gap-4">
+                    <button type="button" class="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                        <i class="fab fa-google text-red-500 mr-2"></i>
+                        <span class="text-gray-700 dark:text-gray-300">Google</span>
+                    </button>
+                    <button type="button" class="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                        <i class="fab fa-github text-gray-800 dark:text-white mr-2"></i>
+                        <span class="text-gray-700 dark:text-gray-300">GitHub</span>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Login Link -->
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Already have an account?
+                    <a href="{{ url_for('auth.login') }}" class="text-blue-600 hover:text-blue-500 dark:text-blue-400 font-semibold">
+                        Log in
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

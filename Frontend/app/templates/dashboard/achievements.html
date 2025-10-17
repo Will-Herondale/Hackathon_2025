@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block title %}Achievements - Lakshya{% endblock %}
+
+{% block content %}
+<div class="pt-16 bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 dark:text-white mb-2 flex items-center">
+                <i class="fas fa-trophy text-yellow-500 mr-3"></i>
+                Your Achievements
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400">
+                Track your progress and celebrate your milestones
+            </p>
+        </div>
+
+        <!-- Achievement Stats -->
+        <div class="grid md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 text-center">
+                <div class="text-4xl mb-2">🏆</div>
+                <div class="text-3xl font-bold text-gray-800 dark:text-white mb-1">{{ achievements|length }}</div>
+                <p class="text-gray-600 dark:text-gray-400 text-sm">Total Achievements</p>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 text-center">
+                <div class="text-4xl mb-2">⭐</div>
+                <div class="text-3xl font-bold text-gray-800 dark:text-white mb-1">{{ badges|length }}</div>
+                <p class="text-gray-600 dark:text-gray-400 text-sm">Badges Earned</p>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 text-center">
+                <div class="text-4xl mb-2">🔥</div>
+                <div class="text-3xl font-bold text-gray-800 dark:text-white mb-1">15</div>
+                <p class="text-gray-600 dark:text-gray-400 text-sm">Day Streak</p>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 text-center">
+                <div class="text-4xl mb-2">📈</div>
+                <div class="text-3xl font-bold text-gray-800 dark:text-white mb-1">Level 7</div>
+                <p class="text-gray-600 dark:text-gray-400 text-sm">Current Level</p>
+            </div>
+        </div>
+
+        <!-- Badges Section -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Badges Collection</h2>
+
+            {% if badges %}
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    {% for badge in badges %}
+                        <div class="text-center p-4 border-2 {{ 'border-yellow-400 bg-yellow-50 dark:bg-yellow-900 dark:bg-opacity-20' if badge.earned else 'border-gray-200 dark:border-gray-700 opacity-50' }} rounded-xl hover:shadow-lg transition">
+                            <div class="text-5xl mb-2">{{ badge.icon }}</div>
+                            <h3 class="font-semibold text-gray-800 dark:text-white text-sm mb-1">{{ badge.name }}</h3>
+                            <p class="text-xs text-gray-600 dark:text-gray-400">{{ badge.description }}</p>
+                            {% if badge.earned %}
+                                <p class="text-xs text-green-600 dark:text-green-400 mt-2">
+                                    <i class="fas fa-check-circle mr-1"></i>Earned
+                                </p>
+                            {% else %}
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                    {{ badge.progress }}% complete
+                                </p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <!-- Default Badge Collection -->
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    <div class="text-center p-4 border-2 border-gray-200 dark:border-gray-700 opacity-50 rounded-xl">
+                        <div class="text-5xl mb-2">🎓</div>
+                        <h3 class="font-semibold text-gray-800 dark:text-white text-sm">First Course</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Complete your first course</p>
+                    </div>
+
+                    <div class="text-center p-4 border-2 border-gray-200 dark:border-gray-700 opacity-50 rounded-xl">
+                        <div class="text-5xl mb-2">📚</div>
+                        <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Bookworm</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Complete 5 courses</p>
+                    </div>
+
+                    <div class="text-center p-4 border-2 border-gray-200 dark:border-gray-700 opacity-50 rounded-xl">
+                        <div class="text-5xl mb-2">🚀</div>
+                        <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Rising Star</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Get 100 profile views</p>
+                    </div>
+
+                    <div class="text-center p-4 border-2 border-gray-200 dark:border-gray-700 opacity-50 rounded-xl">
+                        <div class="text-5xl mb-2">👨‍💻</div>
+                        <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Project Master</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Add 10 projects</p>
+                    </div>
+
+                    <div class="text-center p-4 border-2 border-gray-200 dark:border-gray-700 opacity-50 rounded-xl">
+                        <div class="text-5xl mb-2">🤝</div>
+                        <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Networker</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Connect with 50 people</p>
+                    </div>
+
+                    <div class="text-center p-4 border-2 border-gray-200 dark:border-gray-700 opacity-50 rounded-xl">
+                        <div class="text-5xl mb-2">💼</div>
+                        <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Job Hunter</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Apply to 10 jobs</p>
+                    </div>
+
+                    <div class="text-center p-4 border-2 border-gray-200 dark:border-gray-700 opacity-50 rounded-xl">
+                        <div class="text-5xl mb-2">🎯</div>
+                        <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Goal Achiever</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Complete your first goal</p>
+                    </div>
+
+                    <div class="text-center p-4 border-2 border-gray-200 dark:border-gray-700 opacity-50 rounded-xl">
+                        <div class="text-5xl mb-2">🔥</div>
+                        <h3 class="font-semibold text-gray-800 dark:text-white text-sm">On Fire</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">30-day login streak</p>
+                    </div>
+
+                    <div class="text-center p-4 border-2 border-gray-200 dark:border-gray-700 opacity-50 rounded-xl">
+                        <div class="text-5xl mb-2">🎉</div>
+                        <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Party Animal</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Attend 10 events</p>
+                    </div>
+
+                    <div class="text-center p-4 border-2 border-gray-200 dark:border-gray-700 opacity-50 rounded-xl">
+                        <div class="text-5xl mb-2">💬</div>
+                        <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Communicator</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Send 100 messages</p>
+                    </div>
+
+                    <div class="text-center p-4 border-2 border-gray-200 dark:border-gray-700 opacity-50 rounded-xl">
+                        <div class="text-5xl mb-2">🌟</div>
+                        <h3 class="font-semibold text-gray-800 dark:text-white text-sm">All-Star</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Complete all beginner badges</p>
+                    </div>
+
+                    <div class="text-center p-4 border-2 border-gray-200 dark:border-gray-700 opacity-50 rounded-xl">
+                        <div class="text-5xl mb-2">👑</div>
+                        <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Legend</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Reach Level 20</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Milestones Timeline -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Milestones Timeline</h2>
+
+            {% if achievements %}
+                <div class="relative">
+                    <!-- Timeline Line -->
+                    <div class="absolute left-8 top-0 bottom-0 w-0.5 bg-blue-200 dark:bg-blue-800"></div>
+
+                    <!-- Timeline Items -->
+                    <div class="space-y-6">
+                        {% for achievement in achievements %}
+                            <div class="relative pl-20">
+                                <!-- Timeline Dot -->
+                                <div class="absolute left-5 top-2 w-6 h-6 rounded-full bg-blue-600 border-4 border-white dark:border-gray-800"></div>
+
+                                <!-- Achievement Card -->
+                                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <div class="text-3xl">{{ achievement.icon }}</div>
+                                            <div>
+                                                <h3 class="font-bold text-gray-800 dark:text-white">{{ achievement.title }}</h3>
+                                                <p class="text-sm text-gray-600 dark:text-gray-400">{{ achievement.description }}</p>
+                                            </div>
+                                        </div>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">{{ achievement.date }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-12 text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-medal text-6xl mb-4 opacity-50"></i>
+                    <p class="text-lg">No achievements yet</p>
+                    <p class="text-sm mt-2">Start completing activities to earn your first achievement!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

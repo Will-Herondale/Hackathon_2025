@@ -1,0 +1,569 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Career Advisor - Lakshya{% endblock %}
+
+{% block content %}
+<div class="pt-16 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-block bg-gradient-to-r from-blue-600 to-purple-600 rounded-full p-4 mb-4">
+                <i class="fas fa-robot text-white text-5xl"></i>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-3">
+                AI Career Advisor
+            </h1>
+            <p class="text-xl text-gray-600 dark:text-gray-300">
+                Get personalized career guidance powered by AI
+            </p>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+            <!-- Chat Header -->
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                            <i class="fas fa-robot text-2xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold">Career Advisor AI</h2>
+                            <p class="text-sm text-blue-100">
+                                <span class="inline-block w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                                Online
+                            </p>
+                        </div>
+                    </div>
+                    <button onclick="clearChat()" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-trash-alt mr-2"></i>Clear Chat
+                    </button>
+                </div>
+            </div>
+
+            <!-- Suggested Questions -->
+            <div id="suggestedQuestions" class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-600 p-4 border-b border-gray-200 dark:border-gray-600">
+                <p class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
+                    <i class="fas fa-lightbulb mr-2 text-yellow-500"></i>Try asking:
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    {% if current_user.is_authenticated %}
+                    <button onclick="askQuestion('What courses and events should I take to achieve my goals?')" class="suggested-question">
+                        Course Recommendations
+                    </button>
+                    <button onclick="askQuestion('Create a learning path for me to reach my goals')" class="suggested-question">
+                        Create Learning Path
+                    </button>
+                    <button onclick="askQuestion('What skills do I need to develop next?')" class="suggested-question">
+                        Skill Gap Analysis
+                    </button>
+                    {% else %}
+                    <button onclick="askQuestion('What career path should I choose based on my interests in technology?')" class="suggested-question">
+                        Tech Career Paths
+                    </button>
+                    <button onclick="askQuestion('What skills should I learn for data science?')" class="suggested-question">
+                        Skills to Learn
+                    </button>
+                    <button onclick="askQuestion('What are the best colleges for engineering?')" class="suggested-question">
+                        College Advice
+                    </button>
+                    {% endif %}
+                    <button onclick="askQuestion('How do I prepare for a job interview?')" class="suggested-question">
+                        Interview Prep
+                    </button>
+                    <button onclick="askQuestion('Help me build a roadmap to my dream job')" class="suggested-question">
+                        Career Roadmap
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div id="chatMessages" class="h-[500px] overflow-y-auto p-6 space-y-4">
+                <!-- Welcome Message -->
+                <div class="message-bot">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-robot text-white"></i>
+                        </div>
+                        <div class="message-content bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-tl-none p-4 max-w-[80%]">
+                            <p class="text-gray-800 dark:text-white">
+                                Hello! 👋 I'm your AI Career Advisor. I'm here to help you with:
+                            </p>
+                            <ul class="list-disc list-inside mt-2 text-gray-700 dark:text-gray-300 space-y-1">
+                                <li>Career path recommendations</li>
+                                <li>College and course selection</li>
+                                <li>Skill development guidance</li>
+                                <li>Interview preparation tips</li>
+                                <li>Resume and portfolio advice</li>
+                            </ul>
+                            <p class="mt-3 text-gray-800 dark:text-white">
+                                How can I help you today?
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800">
+                <form id="chatForm" class="flex gap-3">
+                    <input
+                        type="text"
+                        id="userInput"
+                        placeholder="Ask me anything about your career..."
+                        class="flex-1 px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none transition"
+                        autocomplete="off"
+                    >
+                    <button
+                        type="submit"
+                        id="sendButton"
+                        class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <i class="fas fa-paper-plane mr-2"></i>Send
+                    </button>
+                </form>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    AI-powered responses may not always be perfect. Use your judgment.
+                </p>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="grid md:grid-cols-3 gap-6 mt-8">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg">
+                <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-brain text-3xl text-blue-600 dark:text-blue-400"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-2">Smart Recommendations</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Get personalized career advice based on your interests and goals</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg">
+                <div class="w-16 h-16 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-clock text-3xl text-purple-600 dark:text-purple-400"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-2">24/7 Availability</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Get instant answers to your career questions anytime</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg">
+                <div class="w-16 h-16 bg-pink-100 dark:bg-pink-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-chart-line text-3xl text-pink-600 dark:text-pink-400"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-2">Career Growth</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Learn about skills and paths to advance your career</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.suggested-question {
+    @apply bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg text-sm hover:bg-blue-100 dark:hover:bg-blue-700 transition border border-gray-200 dark:border-gray-500;
+}
+
+.message-user {
+    animation: slideInRight 0.3s ease-out;
+}
+
+.message-bot {
+    animation: slideInLeft 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.typing-indicator {
+    display: inline-block;
+}
+
+.typing-indicator span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #94a3b8;
+    margin: 0 2px;
+    animation: typing 1.4s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0%, 60%, 100% {
+        transform: translateY(0);
+    }
+    30% {
+        transform: translateY(-10px);
+    }
+}
+</style>
+
+<script>
+// Use our backend proxy to avoid CORS issues
+const API_ENDPOINT = "/api/ai-chat";
+
+const chatMessages = document.getElementById('chatMessages');
+const chatForm = document.getElementById('chatForm');
+const userInput = document.getElementById('userInput');
+const sendButton = document.getElementById('sendButton');
+const suggestedQuestions = document.getElementById('suggestedQuestions');
+
+// Fetch user goals from dashboard if logged in
+let userGoals = [];
+let userProfile = {};
+
+async function fetchUserContext() {
+    {% if current_user.is_authenticated %}
+    try {
+        const response = await fetch('/api/user-context');
+        if (response.ok) {
+            const data = await response.json();
+            userGoals = data.goals || [];
+            userProfile = data.profile || {};
+        }
+    } catch (error) {
+        console.log('Could not fetch user context');
+    }
+    {% endif %}
+}
+
+// Build system prompt with user context
+function getSystemPrompt() {
+    let basePrompt = "You are a helpful AI career advisor on Lakshya platform. Provide practical, actionable career advice to students and professionals. Focus on career paths, college selection, skill development, interview tips, and professional growth. Be encouraging, informative, and concise.";
+
+    {% if current_user.is_authenticated %}
+    if (userGoals.length > 0) {
+        basePrompt += "\n\nUser's Current Goals:\n";
+        userGoals.forEach(goal => {
+            basePrompt += `- ${goal.title} (${goal.category}) - ${goal.progress}% complete\n`;
+            if (goal.description) {
+                basePrompt += `  Description: ${goal.description}\n`;
+            }
+        });
+        basePrompt += "\nWhen relevant, reference their goals and suggest specific courses, events, or skills they should pursue on Lakshya to achieve these goals. Recommend concrete action steps.";
+    }
+
+    if (userProfile.skills && userProfile.skills.length > 0) {
+        basePrompt += `\n\nUser's Skills: ${userProfile.skills.join(', ')}`;
+    }
+
+    if (userProfile.interests && userProfile.interests.length > 0) {
+        basePrompt += `\n\nUser's Interests: ${userProfile.interests.join(', ')}`;
+    }
+    {% endif %}
+
+    return basePrompt;
+}
+
+let conversationHistory = [];
+
+// Handle form submission
+chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const message = userInput.value.trim();
+
+    if (!message) return;
+
+    // Hide suggested questions after first message
+    suggestedQuestions.style.display = 'none';
+
+    // Add user message to chat
+    addMessage(message, 'user');
+
+    // Clear input
+    userInput.value = '';
+
+    // Disable input while processing
+    userInput.disabled = true;
+    sendButton.disabled = true;
+
+    // Show typing indicator
+    const typingId = showTypingIndicator();
+
+    try {
+        console.log('Sending prompt to backend:', message);
+
+        // Add to conversation history
+        conversationHistory.push({
+            role: "user",
+            content: message
+        });
+
+        // Call our backend proxy instead of the external API directly
+        const response = await fetch(API_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                prompt: message
+            })
+        });
+
+        console.log('Response status:', response.status);
+
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        // Check for errors in the response
+        if (data.error) {
+            const errorMsg = data.error;
+            const details = data.details || '';
+            console.error('API Error:', errorMsg, details);
+
+            // Display user-friendly error
+            let displayError = errorMsg;
+            if (errorMsg.includes('GPT-5-mini')) {
+                displayError = 'The AI service is currently experiencing issues. This might be due to:\n\n' +
+                             '• The AI model is temporarily unavailable\n' +
+                             '• The service is overloaded\n' +
+                             '• The prompt format needs adjustment\n\n' +
+                             'Please try again in a moment or rephrase your question.';
+            }
+            throw new Error(displayError);
+        }
+
+        // Extract the AI response
+        let aiResponse = data.response;
+
+        // If response is an object, convert to string
+        if (typeof aiResponse === 'object') {
+            aiResponse = JSON.stringify(aiResponse, null, 2);
+        }
+
+        // Validate response
+        if (!aiResponse || aiResponse.trim() === '') {
+            throw new Error('API returned empty response');
+        }
+
+        console.log('AI Response:', aiResponse);
+
+        // Add to conversation history
+        conversationHistory.push({
+            role: "assistant",
+            content: aiResponse
+        });
+
+        // Remove typing indicator
+        removeTypingIndicator(typingId);
+
+        // Add AI response to chat
+        addMessage(aiResponse, 'bot');
+
+    } catch (error) {
+        console.error('Full Error Details:', error);
+        removeTypingIndicator(typingId);
+
+        let errorMessage = 'Sorry, I encountered an error. ';
+        if (error.message.includes('Failed to fetch')) {
+            errorMessage += 'Unable to connect to the server. Please check your internet connection or try again later.';
+        } else if (error.message.includes('timed out')) {
+            errorMessage += 'The AI service is taking too long to respond. Please try again.';
+        } else if (error.message.includes('empty response')) {
+            errorMessage += 'The AI service returned an empty response. Please try rephrasing your question.';
+        } else {
+            errorMessage += error.message || 'Please try again.';
+        }
+
+        addMessage(errorMessage, 'bot', true);
+    } finally {
+        // Re-enable input
+        userInput.disabled = false;
+        sendButton.disabled = false;
+        userInput.focus();
+    }
+});
+
+function addMessage(text, sender, isError = false) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message-${sender}`;
+
+    if (sender === 'user') {
+        messageDiv.innerHTML = `
+            <div class="flex items-start gap-3 justify-end">
+                <div class="message-content bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl rounded-tr-none p-4 max-w-[80%]">
+                    <p>${escapeHtml(text)}</p>
+                </div>
+                <div class="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-user text-gray-700 dark:text-gray-300"></i>
+                </div>
+            </div>
+        `;
+    } else {
+        messageDiv.innerHTML = `
+            <div class="flex items-start gap-3">
+                <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-robot text-white"></i>
+                </div>
+                <div class="message-content ${isError ? 'bg-red-100 dark:bg-red-900' : 'bg-gray-100 dark:bg-gray-700'} rounded-2xl rounded-tl-none p-4 max-w-[80%]">
+                    <p class="text-gray-800 dark:text-white whitespace-pre-wrap">${formatMessage(text)}</p>
+                </div>
+            </div>
+        `;
+    }
+
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function showTypingIndicator() {
+    const typingDiv = document.createElement('div');
+    const id = 'typing-' + Date.now();
+    typingDiv.id = id;
+    typingDiv.className = 'message-bot';
+    typingDiv.innerHTML = `
+        <div class="flex items-start gap-3">
+            <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-robot text-white"></i>
+            </div>
+            <div class="message-content bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-tl-none p-4">
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    `;
+    chatMessages.appendChild(typingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return id;
+}
+
+function removeTypingIndicator(id) {
+    const typingDiv = document.getElementById(id);
+    if (typingDiv) {
+        typingDiv.remove();
+    }
+}
+
+function formatMessage(text) {
+    // Convert markdown-style formatting to HTML
+    text = escapeHtml(text);
+
+    // Bold
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+    // Bullet points
+    text = text.replace(/^- (.*?)$/gm, '• $1');
+    text = text.replace(/^\* (.*?)$/gm, '• $1');
+
+    // Numbered lists
+    text = text.replace(/^(\d+)\. (.*?)$/gm, '<strong>$1.</strong> $2');
+
+    return text;
+}
+
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+function askQuestion(question) {
+    userInput.value = question;
+    chatForm.dispatchEvent(new Event('submit'));
+}
+
+function clearChat() {
+    if (confirm('Are you sure you want to clear the chat history?')) {
+        // Clear conversation history
+        conversationHistory = [];
+
+        // Clear chat UI
+        chatMessages.innerHTML = `
+            <div class="message-bot">
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-robot text-white"></i>
+                    </div>
+                    <div class="message-content bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-tl-none p-4 max-w-[80%]">
+                        <p class="text-gray-800 dark:text-white">
+                            Hello! 👋 I'm your AI Career Advisor. I'm here to help you with:
+                        </p>
+                        <ul class="list-disc list-inside mt-2 text-gray-700 dark:text-gray-300 space-y-1">
+                            <li>Career path recommendations</li>
+                            <li>College and course selection</li>
+                            <li>Skill development guidance</li>
+                            <li>Interview preparation tips</li>
+                            <li>Resume and portfolio advice</li>
+                        </ul>
+                        <p class="mt-3 text-gray-800 dark:text-white">
+                            How can I help you today?
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Show suggested questions again
+        suggestedQuestions.style.display = 'block';
+    }
+}
+
+// Initialize on page load
+(async function() {
+    await fetchUserContext();
+
+    // Add welcome message with user context
+    {% if current_user.is_authenticated %}
+    if (userGoals.length > 0) {
+        const welcomeAddition = document.createElement('div');
+        welcomeAddition.className = 'message-bot mt-4';
+        welcomeAddition.innerHTML = `
+            <div class="flex items-start gap-3">
+                <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-robot text-white"></i>
+                </div>
+                <div class="message-content bg-blue-50 dark:bg-blue-900 dark:bg-opacity-30 rounded-2xl rounded-tl-none p-4 max-w-[80%]">
+                    <p class="text-gray-800 dark:text-white font-semibold mb-2">
+                        <i class="fas fa-bullseye text-blue-600 mr-2"></i>I see you have ${userGoals.length} goal${userGoals.length > 1 ? 's' : ''} set!
+                    </p>
+                    <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-1">
+                        ${userGoals.slice(0, 3).map(goal => `<li>${goal.title} (${goal.progress}% complete)</li>`).join('')}
+                    </ul>
+                    <p class="mt-3 text-gray-800 dark:text-white">
+                        I can help you create a personalized learning path to achieve your goals! Just ask me about courses, skills, or steps you should take.
+                    </p>
+                </div>
+            </div>
+        `;
+        chatMessages.appendChild(welcomeAddition);
+    }
+    {% endif %}
+})();
+
+// Auto-focus input on load
+userInput.focus();
+</script>
+{% endblock %}

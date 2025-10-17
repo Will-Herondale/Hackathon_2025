@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}Events & Courses - Lakshya{% endblock %}
+
+{% block content %}
+<div class="pt-16 bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-12">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl font-bold mb-4">Events & Courses</h1>
+            <p class="text-xl text-purple-100">Discover workshops, courses, and events to boost your skills</p>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Filters -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+            <form method="GET" action="{{ url_for('events.browse') }}" class="grid md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
+                    <select name="category" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="">All Categories</option>
+                        <option value="programming" {{ 'selected' if category == 'programming' else '' }}>Programming</option>
+                        <option value="design" {{ 'selected' if category == 'design' else '' }}>Design</option>
+                        <option value="business" {{ 'selected' if category == 'business' else '' }}>Business</option>
+                        <option value="marketing" {{ 'selected' if category == 'marketing' else '' }}>Marketing</option>
+                        <option value="data-science" {{ 'selected' if category == 'data-science' else '' }}>Data Science</option>
+                        <option value="ai-ml" {{ 'selected' if category == 'ai-ml' else '' }}>AI & ML</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Level</label>
+                    <select name="level" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="">All Levels</option>
+                        <option value="beginner" {{ 'selected' if level == 'beginner' else '' }}>Beginner</option>
+                        <option value="intermediate" {{ 'selected' if level == 'intermediate' else '' }}>Intermediate</option>
+                        <option value="advanced" {{ 'selected' if level == 'advanced' else '' }}>Advanced</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Type</label>
+                    <select name="type" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <option value="">All Types</option>
+                        <option value="workshop" {{ 'selected' if event_type == 'workshop' else '' }}>Workshop</option>
+                        <option value="course" {{ 'selected' if event_type == 'course' else '' }}>Course</option>
+                        <option value="webinar" {{ 'selected' if event_type == 'webinar' else '' }}>Webinar</option>
+                        <option value="meetup" {{ 'selected' if event_type == 'meetup' else '' }}>Meetup</option>
+                        <option value="hackathon" {{ 'selected' if event_type == 'hackathon' else '' }}>Hackathon</option>
+                    </select>
+                </div>
+
+                <div class="flex items-end">
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-filter mr-2"></i>Apply Filters
+                    </button>
+                </div>
+            </form>
+
+            {% if current_user.is_authenticated %}
+                <div class="mt-4 flex justify-end">
+                    <a href="{{ url_for('events.create') }}" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition">
+                        <i class="fas fa-plus mr-2"></i>Create Event
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Events Grid -->
+        {% if events %}
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {% for event in events %}
+                    <div class="event-card {{ 'featured' if event.featured else '' }} bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition">
+                        {% if event.image %}
+                            <img src="{{ event.image }}" alt="{{ event.title }}" class="w-full h-48 object-cover">
+                        {% else %}
+                            <div class="w-full h-48 bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+                                <i class="fas fa-calendar-alt text-white text-6xl"></i>
+                            </div>
+                        {% endif %}
+
+                        <div class="p-6">
+                            <!-- Event Type Badge -->
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-3 py-1 rounded-full text-xs font-semibold uppercase">
+                                    {{ event.event_type }}
+                                </span>
+                                {% if event.price == 0 %}
+                                    <span class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-xs font-semibold">
+                                        FREE
+                                    </span>
+                                {% else %}
+                                    <span class="text-gray-600 dark:text-gray-400 font-semibold">
+                                        ${{ event.price }}
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Title -->
+                            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">
+                                {{ event.title }}
+                            </h3>
+
+                            <!-- Description -->
+                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">
+                                {{ event.description }}
+                            </p>
+
+                            <!-- Details -->
+                            <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
+                                <div class="flex items-center">
+                                    <i class="fas fa-calendar mr-2 text-purple-600"></i>
+                                    {{ event.start_date.strftime('%b %d, %Y') if event.start_date else 'TBA' }}
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-map-marker-alt mr-2 text-purple-600"></i>
+                                    {{ event.location_type | title }}
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-signal mr-2 text-purple-600"></i>
+                                    {{ event.level | title }}
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex gap-2">
+                                {% if event.registration_url %}
+                                    <a href="{{ event.registration_url }}" target="_blank" class="flex-1 bg-blue-600 text-white text-center py-2 rounded-lg hover:bg-blue-700 transition">
+                                        <i class="fas fa-external-link-alt mr-2"></i>Register Now
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('events.detail', event_id=event.id) }}" class="flex-1 bg-blue-600 text-white text-center py-2 rounded-lg hover:bg-blue-700 transition">
+                                        View Details
+                                    </a>
+                                {% endif %}
+                                {% if current_user.is_authenticated %}
+                                    <button onclick="bookmarkEvent({{ event.id }})" class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                                        <i class="fas fa-bookmark"></i>
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if total_pages > 1 %}
+                <div class="flex justify-center gap-2">
+                    {% if page > 1 %}
+                        <a href="?page={{ page - 1 }}&category={{ category }}&level={{ level }}&type={{ event_type }}"
+                           class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </a>
+                    {% endif %}
+
+                    <span class="bg-blue-600 text-white px-4 py-2 rounded-lg">
+                        Page {{ page }} of {{ total_pages }}
+                    </span>
+
+                    {% if page < total_pages %}
+                        <a href="?page={{ page + 1 }}&category={{ category }}&level={{ level }}&type={{ event_type }}"
+                           class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-20 text-gray-500 dark:text-gray-400">
+                <i class="fas fa-calendar-times text-6xl mb-4"></i>
+                <p class="text-xl">No events found matching your criteria</p>
+                <p class="text-sm mt-2">Try adjusting your filters or check back later!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
+{% endblock %}
