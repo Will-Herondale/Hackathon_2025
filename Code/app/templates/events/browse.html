@@ -71,7 +71,7 @@
         {% if events %}
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 {% for event in events %}
-                    <div class="event-card {{ 'featured' if event.featured else '' }} bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition">
+                    <div class="event-card {{ 'featured' if event.featured else '' }} bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition cursor-pointer" onclick="handleEventClick(event, '{{ event.registration_url if event.registration_url else '#' }}', true)">
                         {% if event.image %}
                             <img src="{{ event.image }}" alt="{{ event.title }}" class="w-full h-48 object-cover">
                         {% else %}
@@ -126,16 +126,16 @@
                             <!-- Actions -->
                             <div class="flex gap-2">
                                 {% if event.registration_url %}
-                                    <a href="{{ event.registration_url }}" target="_blank" class="flex-1 bg-blue-600 text-white text-center py-2 rounded-lg hover:bg-blue-700 transition">
+                                    <span class="flex-1 bg-blue-600 text-white text-center py-2 rounded-lg pointer-events-none">
                                         <i class="fas fa-external-link-alt mr-2"></i>Register Now
-                                    </a>
+                                    </span>
                                 {% else %}
-                                    <a href="{{ url_for('events.detail', event_id=event.id) }}" class="flex-1 bg-blue-600 text-white text-center py-2 rounded-lg hover:bg-blue-700 transition">
+                                    <span class="flex-1 bg-blue-600 text-white text-center py-2 rounded-lg pointer-events-none">
                                         View Details
-                                    </a>
+                                    </span>
                                 {% endif %}
                                 {% if current_user.is_authenticated %}
-                                    <button onclick="bookmarkEvent({{ event.id }})" class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                                    <button onclick="event.stopPropagation(); bookmarkEvent({{ event.id }})" class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
                                         <i class="fas fa-bookmark"></i>
                                     </button>
                                 {% endif %}
@@ -185,4 +185,33 @@
     overflow: hidden;
 }
 </style>
+
+<script>
+function handleEventClick(event, url, isExternal) {
+    // Only redirect if there's a valid URL
+    if (url && url !== '#') {
+        window.open(url, '_blank');
+    } else {
+        // Show message if no registration URL is available
+        alert('No registration link available for this event yet.');
+    }
+}
+
+function bookmarkEvent(eventId) {
+    // Bookmark functionality (to be implemented)
+    fetch(`/events/${eventId}/bookmark`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Event bookmarked!');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
 {% endblock %}

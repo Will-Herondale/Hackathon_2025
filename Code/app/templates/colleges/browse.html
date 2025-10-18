@@ -58,7 +58,7 @@
         {% if colleges %}
             <div class="space-y-6 mb-8">
                 {% for college in colleges %}
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-xl transition {% if college.website_url %}cursor-pointer{% endif %}" {% if college.website_url %}onclick="openCollegeWebsite('{{ college.website_url }}')"{% endif %}>
                         <div class="p-6">
                             <div class="flex items-start gap-4">
                                 <!-- College Icon -->
@@ -106,7 +106,7 @@
                                         {% if college.placement_average_salary %}
                                             <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
                                                 <div class="text-xs text-gray-600 dark:text-gray-400">Avg. Salary</div>
-                                                <div class="text-lg font-bold text-gray-800 dark:text-white">₹{{ college.placement_average_salary }}L</div>
+                                                <div class="text-lg font-bold text-gray-800 dark:text-white">₹{{ college.placement_average_salary | lakhs }}L</div>
                                             </div>
                                         {% endif %}
                                         {% if college.accreditation %}
@@ -125,13 +125,13 @@
 
                                     <!-- Actions -->
                                     <div class="flex gap-3">
-                                        <a href="{{ url_for('colleges.detail', college_id=college.id) }}" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                                        <a href="{{ url_for('colleges.detail', college_id=college.id) }}" onclick="event.stopPropagation()" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
                                             <i class="fas fa-info-circle mr-2"></i>View Details
                                         </a>
                                         {% if college.website_url %}
-                                            <a href="{{ college.website_url }}" target="_blank" class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-6 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
-                                                <i class="fas fa-external-link-alt mr-2"></i>Website
-                                            </a>
+                                            <span class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-6 py-2 rounded-lg pointer-events-none">
+                                                <i class="fas fa-external-link-alt mr-2"></i>Visit Website
+                                            </span>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -172,4 +172,16 @@
         {% endif %}
     </div>
 </div>
+
+<script>
+function openCollegeWebsite(url) {
+    // Ensure URL has protocol (http:// or https://)
+    if (url && !url.match(/^https?:\/\//i)) {
+        url = 'https://' + url;
+    }
+    if (url) {
+        window.open(url, '_blank');
+    }
+}
+</script>
 {% endblock %}

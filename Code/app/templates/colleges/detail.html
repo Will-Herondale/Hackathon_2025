@@ -162,7 +162,7 @@
                         </h3>
                         <div class="bg-gradient-to-r from-green-500 to-blue-500 text-white p-6 rounded-lg text-center">
                             <div class="text-sm mb-2">Average Salary</div>
-                            <div class="text-4xl font-bold">₹{{ college.placement_average_salary }}L</div>
+                            <div class="text-4xl font-bold">₹{{ college.placement_average_salary | lakhs }}L</div>
                             <div class="text-sm mt-2 opacity-80">per annum</div>
                         </div>
                     </div>
@@ -211,9 +211,9 @@
                             <i class="fas fa-book mr-2"></i>Get Course Recommendations
                         </button>
                         {% if college.website_url %}
-                            <a href="{{ college.website_url }}" target="_blank" class="block w-full bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition text-center">
+                            <button onclick="openCollegeWebsite('{{ college.website_url }}')" class="block w-full bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition text-center">
                                 <i class="fas fa-external-link-alt mr-2"></i>Visit Website
-                            </a>
+                            </button>
                         {% endif %}
                         <a href="{{ url_for('colleges.browse') }}" class="block w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-6 py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition text-center">
                             <i class="fas fa-arrow-left mr-2"></i>Back to Browse
@@ -247,6 +247,16 @@
 </div>
 
 <script>
+function openCollegeWebsite(url) {
+    // Ensure URL has protocol (http:// or https://)
+    if (url && !url.match(/^https?:\/\//i)) {
+        url = 'https://' + url;
+    }
+    if (url) {
+        window.open(url, '_blank');
+    }
+}
+
 function getCourseRecommendations() {
     const collegeName = "{{ college.college_name }}";
 
